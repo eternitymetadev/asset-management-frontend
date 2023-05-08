@@ -44,10 +44,7 @@ class SettingController extends Controller
         try {
             $this->prefix = request()->route()->getPrefix();
             $rules = array(
-                // 'name' => 'required',
-                // 'login_id' => 'required',
-                // 'email'  => 'required',
-                'name'      => ['required', 'string', 'unique:categories'],
+                'name' => 'required|unique:categories',
             );
             $validator = Validator::make($request->all(),$rules);
             
@@ -93,10 +90,7 @@ class SettingController extends Controller
         try {
             $this->prefix = request()->route()->getPrefix();
             $rules = array(
-                // 'name' => 'required',
-                // 'login_id' => 'required',
-                // 'email'  => 'required',
-                // 'name'      => ['required', 'string', 'unique:categories'],
+                'name' => 'required',
             );
             $validator = Validator::make($request->all(),$rules);
             
@@ -106,6 +100,16 @@ class SettingController extends Controller
                 $response['success']     = false;
                 $response['formErrors']  = true;
                 $response['errors']      = $errors;
+                return response()->json($response);
+            }
+
+            $check_name_exist = Category::where('id', '!=', $request->id)->where(['name' => $request['name']])->get();
+
+            if (!$check_name_exist->isEmpty()) {
+                $response['success']     = false;
+                $response['formErrors']  = true;
+                $response['errors']      = "Name already exists.";
+
                 return response()->json($response);
             }
 
@@ -167,10 +171,7 @@ class SettingController extends Controller
         try {
             $this->prefix = request()->route()->getPrefix();
             $rules = array(
-                // 'name' => 'required',
-                // 'login_id' => 'required',
-                // 'email'  => 'required',
-                'name'      => ['required', 'string', 'unique:brands'],
+                'name' => 'required|unique:brands',
             );
             $validator = Validator::make($request->all(),$rules);
             
@@ -216,10 +217,7 @@ class SettingController extends Controller
         try {
             $this->prefix = request()->route()->getPrefix();
             $rules = array(
-                // 'name' => 'required',
-                // 'login_id' => 'required',
-                // 'email'  => 'required',
-                // 'name'      => ['required', 'string', 'unique:categories'],
+                'name' => 'required',
             );
             $validator = Validator::make($request->all(),$rules);
             
@@ -229,6 +227,17 @@ class SettingController extends Controller
                 $response['success']     = false;
                 $response['formErrors']  = true;
                 $response['errors']      = $errors;
+                return response()->json($response);
+            }
+
+            $check_name_exist = Brand::where('id', '!=', $request->id)->where(['name' => $request['name']])->get();
+
+            if (!$check_name_exist->isEmpty()) {
+
+                $response['success']     = false;
+                $response['formErrors']  = true;
+                $response['errors']      = "Name already exists.";
+
                 return response()->json($response);
             }
 

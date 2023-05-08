@@ -23,6 +23,19 @@ class CreateInventoryInvoicesTable extends Migration
             $table->string('model')->nullable();
             $table->string('unit_price')->nullable();
             $table->string('invc_image')->nullable();
+            $table->string('asset_type')->nullable(); // hardware/software
+            $table->string('undertaking')->nullable(); 
+            $table->string('undertaking_image')->nullable();
+            $table->string('assign_emp_id')->nullable();
+            $table->string('assign_emp_name')->nullable();
+            $table->string('cancelled_date')->nullable();
+            $table->string('assigned_date')->nullable();
+            $table->string('unassigned_date')->nullable();
+            $table->string('scraped_date')->nullable();
+            $table->string('asset_parent_id')->nullable();
+            $table->json('asset_children_id')->nullable();
+            $table->string('remarks')->nullable();
+            $table->tinyInteger('is_approved')->default(1)->comment("0=>pending 1=>approved 2=>declined");
             $table->tinyInteger('status')->default(0)->comment("0=>cancel 1=>unassigned 2=>assigned 3=>scrapped");
             $table->timestamps();
         });

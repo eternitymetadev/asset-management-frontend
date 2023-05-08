@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Location;
+use App\Models\Department;
 use App\Models\Permission;
 use Helper;
 use URL;
@@ -42,10 +43,12 @@ class UserController extends Controller
         // $getpermissions = Permission::all();
             $getroles = Role::all();
             $getlocations = Location::all();
+            $getdepartments = Department::all();
             $getpermissions = Permission::all();
 
             $data['roles'] = $getroles;
             $data['locations'] = $getlocations;
+            $data['departments'] = $getdepartments;
             $data['permissions'] = $getpermissions;
             $message = "Role and location list fetch";
             $status = true;
@@ -80,7 +83,7 @@ class UserController extends Controller
             $requestData['login_id'] = $request->login_id;
             $requestData['phone'] = $request->phone;
             $requestData['role_id'] = $request->role_id;
-            $requestData['branch_id'] = $request->branch_id;
+            $requestData['department_id'] = $request->department_id;
             $requestData['status'] = 1;
             
             try {

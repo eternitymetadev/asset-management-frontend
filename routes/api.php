@@ -45,9 +45,27 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('inventories', [InventoryController::class, 'inventoryList']);
     Route::post('create-inventory', [InventoryController::class, 'createInventory']);
     Route::post('update-inventory', [InventoryController::class, 'updateInventory']);
+    Route::post('update-assign-status', [InventoryController::class, 'updateAssignStatus']);
+    
 
     Route::get('get-vendors/{id}', [InventoryController::class, 'getVendor']);
+    Route::get('get-brand', [InventoryController::class,'getBrand']);
 
+    Route::any('inventory/export', [InventoryController::class, 'exportInventory']);
+    Route::post('inventory/bulk-upload', [InventoryController::class, 'bulkUpload']);
+
+    Route::post('undertaking-upload/{id}', [InventoryController::class, 'undertakingUpload']);
+    Route::get('sample-inventories',[InventoryController::class, 'inventorySampleDownload']);
+
+    
+ 
     // Route::any('/settings/delete-category', [SettingController::class, 'deleteCategory']);
 
 });
+
+Route::get('check-serialno/{sno}', [InventoryController::class,'CheckSerialno']);
+Route::get('get-employee', [InventoryController::class, 'getEmployee']);
+
+Route::any('approved-asset/{id}', [InventoryController::class, 'approvedAsset']);
+Route::any('declined-asset/{id}', [InventoryController::class, 'declinedAsset']);
+Route::get('pdf-inventory/{id}', [InventoryController::class, 'pdfInventory']);

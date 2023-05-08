@@ -9,9 +9,9 @@ class InventoryInvoice extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'inventory_id', 'sno', 'un_id', 'category_id', 'brand_id', 'model', 'unit_price', 'invc_image', 'status', 'created_at', 'updated_at'
+        'inventory_id', 'sno', 'un_id', 'category_id', 'brand_id', 'model', 'unit_price', 'invc_image', 'asset_type', 'undertaking', 'undertaking_image', 'assign_emp_id', 'assign_emp_name','cancelled_date','assigned_date', 'unassigned_date', 'scraped_date', 'asset_parent_id', 'asset_children_id', 'remarks', 'is_approved', 'status', 'created_at', 'updated_at'
     ];
-
+    
     public function Inventories(){
     	return $this->belongsTo('App\Models\Inventory','inventory_id','id');	
     }

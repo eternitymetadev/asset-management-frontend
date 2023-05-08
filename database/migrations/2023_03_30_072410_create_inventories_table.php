@@ -17,6 +17,7 @@ class CreateInventoriesTable extends Migration
             $table->increments('id');
             $table->string('unit_id')->nullable();
             $table->string('vendor_id')->nullable();
+            $table->string('vendor_name')->nullable();
             $table->string('un_id')->nullable();
             $table->string('invoice_no')->nullable();
             $table->string('invoice_date')->nullable();
