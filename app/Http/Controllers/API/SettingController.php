@@ -34,7 +34,7 @@ class SettingController extends Controller
             $data = $query;
             $message = "Invalid Record";
             $status = false;
-            $errorCode = 401;
+            $errorCode = 402;
         }
         return Helper::apiResponseSend($message,$data,$status,$errorCode);
     }
@@ -74,7 +74,7 @@ class SettingController extends Controller
                 $data = $addcategory;
                 $message = "Invalid Record";
                 $status = false;
-                $errorCode = 401;
+                $errorCode = 402;
             }
         }catch(Exception $e) {
             $data = '';
@@ -133,7 +133,7 @@ class SettingController extends Controller
                 $data = $addcategory;
                 $message = "Invalid Record";
                 $status = false;
-                $errorCode = 401;
+                $errorCode = 402;
             }
         }catch(Exception $e) {
             $data = '';
@@ -161,7 +161,7 @@ class SettingController extends Controller
             $data = $query;
             $message = "Invalid Record";
             $status = false;
-            $errorCode = 401;
+            $errorCode = 402;
         }
         return Helper::apiResponseSend($message,$data,$status,$errorCode);
     }
@@ -201,7 +201,7 @@ class SettingController extends Controller
                 $data = $addbrand;
                 $message = "Invalid Record";
                 $status = false;
-                $errorCode = 401;
+                $errorCode = 402;
             }
         }catch(Exception $e) {
             $data = '';
@@ -261,7 +261,7 @@ class SettingController extends Controller
                 $data = $addbrand;
                 $message = "Invalid Record";
                 $status = false;
-                $errorCode = 401;
+                $errorCode = 402;
             }
         }catch(Exception $e) {
             $data = '';

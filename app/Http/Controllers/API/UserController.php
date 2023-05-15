@@ -33,7 +33,7 @@ class UserController extends Controller
             $data = $query;
             $message = "Invalid Record";
             $status = false;
-            $errorCode = 401;
+            $errorCode = 402;
         }
         return Helper::apiResponseSend($message,$data,$status,$errorCode);
     }
@@ -97,7 +97,7 @@ class UserController extends Controller
                     $data = $requestData;
                     $message = "Invalid Record";
                     $status = false;
-                    $errorCode = 401;
+                    $errorCode = 402;
                 }
             } catch (Exception $e) {
                 $data = '';
@@ -165,13 +165,13 @@ class UserController extends Controller
                 $data = $usersave;
                 $message = "Invalid Record";
                 $status = false;
-                $errorCode = 401;
+                $errorCode = 402;
             }
         }catch(Exception $e) {
             $data = $usersave;
             $message = "Invalid Record";
             $status = false;
-            $errorCode = 401;
+            $errorCode = 402;
         }
         return Helper::apiResponseSend($message,$data,$status,$errorCode);
     }
@@ -214,13 +214,13 @@ class UserController extends Controller
                 $data = $usersave;
                 $message = "Invalid Record";
                 $status = false;
-                $errorCode = 401;
+                $errorCode = 402;
             }
         }catch(Exception $e) {
             $data = $usersave;
             $message = "Invalid Record";
             $status = false;
-            $errorCode = 401;
+            $errorCode = 402;
         }
         return Helper::apiResponseSend($message,$data,$status,$errorCode);
     }   
@@ -243,7 +243,7 @@ class UserController extends Controller
             $data = $getuser;
             $message = "User fetch failed";
             $status = false;
-            $errorCode = 401;
+            $errorCode = 402;
         }
         return Helper::apiResponseSend($message,$data,$status,$errorCode);
     }
@@ -261,13 +261,13 @@ class UserController extends Controller
                 $data = $user;
                 $message = "Delete Failed";
                 $status = false;
-                $errorCode = 401;
+                $errorCode = 402;
             }
         }catch(Exception $e) {
             $data = $user;
             $message = "Delete Failed";
             $status = false;
-            $errorCode = 401;
+            $errorCode = 402;
         }
         return Helper::apiResponseSend($message,$data,$status,$errorCode);
     }
@@ -284,7 +284,7 @@ class UserController extends Controller
             $data = '';
             $message = "Can not fetch email";
             $status = false;
-            $errorCode = 401;
+            $errorCode = 402;
         }
         return Helper::apiResponseSend($message,$data,$status,$errorCode);
     }

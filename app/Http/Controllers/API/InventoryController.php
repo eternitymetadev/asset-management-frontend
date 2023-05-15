@@ -51,7 +51,7 @@ class InventoryController extends Controller
             $data = $query;
             $message = "Invalid Record";
             $status = false;
-            $errorCode = 401;
+            $errorCode = 402;
         }
         return Helper::apiResponseSend($message,$data,$status,$errorCode);
     }
@@ -213,7 +213,7 @@ class InventoryController extends Controller
                 $data = $addinventory;
                 $message = "Invalid Record";
                 $status = false;
-                $errorCode = 401;
+                $errorCode = 402;
             }
         }catch(Exception $e) {
             $data = '';
@@ -330,7 +330,7 @@ class InventoryController extends Controller
                 $data = $addinventory;
                 $message = "Invalid Record";
                 $status = false;
-                $errorCode = 401;
+                $errorCode = 402;
             }
         }catch(Exception $e) {
             $data = '';
@@ -366,7 +366,7 @@ class InventoryController extends Controller
                 $data = $addinventory;
                 $message = "Invalid Record";
                 $status = false;
-                $errorCode = 401;
+                $errorCode = 402;
             }
         }catch(Exception $e) {
             $data = '';
@@ -400,7 +400,7 @@ class InventoryController extends Controller
                 $data = $addinventory;
                 $message = "Invalid Record";
                 $status = false;
-                $errorCode = 401;
+                $errorCode = 402;
             }
         }catch(Exception $e) {
             $data = '';
@@ -444,7 +444,7 @@ class InventoryController extends Controller
                 $data = $addinventory;
                 $message = "Invalid Record";
                 $status = false;
-                $errorCode = 401;
+                $errorCode = 402;
             }
         }catch(Exception $e) {
             $data = '';
@@ -511,7 +511,7 @@ class InventoryController extends Controller
             $data = $query;
             $message = "Invalid Record";
             $status = false;
-            $errorCode = 401;
+            $errorCode = 402;
         }
         return Helper::apiResponseSend($message,$data,$status,$errorCode);
     }
@@ -542,13 +542,13 @@ class InventoryController extends Controller
                 $data = '';
                 $message = "Serial-no not exist";
                 $status = false;
-                $errorCode = 401;
+                $errorCode = 402;
             }
         }catch(Exception $e) {
             $data = '';
             $message = "Invalid Record";
             $status = false;
-            $errorCode = 401;
+            $errorCode = 402;
         }
             
         return Helper::apiResponseSend($message,$data,$status,$errorCode);
@@ -594,7 +594,7 @@ class InventoryController extends Controller
             $data = $query;
             $message = "Invalid Record";
             $status = false;
-            $errorCode = 401;
+            $errorCode = 402;
         }        
         return Helper::apiResponseSend($message,$data,$status,$errorCode);
     }
@@ -616,14 +616,14 @@ class InventoryController extends Controller
                 $data = '';
                 $message = "Inventory imported failed!";
                 $status = false;
-                $errorCode = 401;
+                $errorCode = 402;
             }
         }catch(Exception $e) {
             
             $data = '';
             $message = "Invalid Record";
             $status = false;
-            $errorCode = 401;
+            $errorCode = 402;
         }
     
     return Helper::apiResponseSend($message,$data,$status,$errorCode);

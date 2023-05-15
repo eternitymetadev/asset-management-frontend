@@ -61,7 +61,7 @@ class JwtAuthController extends Controller
      *             )
      *         }
      *     ),
-     *   @OA\Response(response=401, description="invalid credentials"),
+     *   @OA\Response(response=402, description="invalid credentials"),
      *   @OA\Response(response=500, description="could not create token")
      * )
      */
@@ -87,7 +87,7 @@ class JwtAuthController extends Controller
                 if (! $token = JWTAuth::attempt($credentials)) {
                     $message = "invalid credentials";
                     $status = false;
-                    $errorCode = 401;
+                    $errorCode = 402;
                 } else{
                     $user = Auth::user();
                     if($user->status==1){
@@ -187,7 +187,7 @@ class JwtAuthController extends Controller
      *         }
      *     ),
      *  
-     *   @OA\Response(response=401, description="Authorization Token not found"),
+     *   @OA\Response(response=402, description="Authorization Token not found"),
      *   @OA\Response(response=500, description="Internal server error")
      * )
      */
@@ -241,13 +241,13 @@ class JwtAuthController extends Controller
                         //     $data = $clientData;
                         //     $message = "Invalid Record";
                         //     $status = false;
-                        //     $errorCode = 401;
+                        //     $errorCode = 402;
                         // }
                     } else{
                         $data = $requestData;
                         $message = "Invalid Record";
                         $status = false;
-                        $errorCode = 401;
+                        $errorCode = 402;
                     }
                 } catch (Exception $e) {
                     $data = '';
