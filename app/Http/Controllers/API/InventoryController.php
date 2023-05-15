@@ -462,8 +462,7 @@ class InventoryController extends Controller
         $pdf->loadHTML('hiii');
         $pdf->setPaper('legal', 'portrait');
         return $pdf->download('itsolutionstuff.pdf');
-
-
+        
         // $data = [
         //     // 'invoices' => $query,
         //     'title' => 'Welcome to ItSolutionStuff.com',
