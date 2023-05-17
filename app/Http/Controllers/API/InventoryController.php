@@ -149,7 +149,7 @@ class InventoryController extends Controller
                     $data[$i]['brand_id'] = $request->inventoryItems[$i]['brand_id'];
                     $data[$i]['model'] = $request->inventoryItems[$i]['model'];
                     $data[$i]['unit_price'] = $request->inventoryItems[$i]['unit_price'];
-                    // $data[$i]['unassigned_date'] = date("d-m-Y");
+                    // $data[$i]['unassigned_date'] = date("d-m-Y H:i:s");
                     $data[$i]['status'] = 1;
 
                     $un_id = InventoryInvoice::select('id','un_id')->latest('un_id')->first();
@@ -168,7 +168,7 @@ class InventoryController extends Controller
                     $add_history[$i]['inventory_invoice_id'] = $saveinventoryinvoices->id;
                     $add_history[$i]['created_user_id'] = $authuser->id;
                     $add_history[$i]['status'] = 1;
-                    // $add_history[$i]['unassigned_date'] = date("d-m-Y");
+                    // $add_history[$i]['unassigned_date'] = date("d-m-Y H:i:s");
 
                     InventoryHistory::create($add_history[$i]);
                 }
@@ -255,22 +255,22 @@ class InventoryController extends Controller
                 $updateinventory['remarks'] = $request->remarks;
             }
             if($request->status == 0){
-                $updateinventory['cancelled_date'] = date("d-m-Y");
+                $updateinventory['cancelled_date'] = date("d-m-Y H:i:s");
                 $updateinventory['assign_emp_id'] = '';
                 $updateinventory['assign_emp_name'] = '';
             }
             if($request->status == 1){
-                $updateinventory['unassigned_date'] = date("d-m-Y");
+                $updateinventory['unassigned_date'] = date("d-m-Y H:i:s");
                 $updateinventory['assign_emp_id'] = '';
                 $updateinventory['assign_emp_name'] = '';
             }
             if($request->status == 2){
-                $updateinventory['assigned_date'] = date("d-m-Y");
+                $updateinventory['assigned_date'] = date("d-m-Y H:i:s");
                 $updateinventory['assign_emp_id'] = $request->assign_emp_id;
                 $updateinventory['assign_emp_name'] = $request->assign_emp_name;
             }
             if($request->status == 3){
-                $updateinventory['scraped_date'] = date("d-m-Y");
+                $updateinventory['scraped_date'] = date("d-m-Y H:i:s");
                 $updateinventory['assign_emp_id'] = '';
                 $updateinventory['assign_emp_name'] = '';
             }
@@ -291,16 +291,16 @@ class InventoryController extends Controller
                 $add_history['assign_status'] = $request->status;
             }
             if($request->status == 0){
-                $add_history['cancelled_date'] = date("d-m-Y");
+                $add_history['cancelled_date'] = date("d-m-Y H:i:s");
             }
             if($request->status == 1){
-                $add_history['unassigned_date'] = date("d-m-Y");
+                $add_history['unassigned_date'] = date("d-m-Y H:i:s");
             }
             if($request->status == 2){
-                $add_history['assigned_date'] = date("d-m-Y");
+                $add_history['assigned_date'] = date("d-m-Y H:i:s");
             }
             if($request->status == 3){
-                $add_history['scraped_date'] = date("d-m-Y");
+                $add_history['scraped_date'] = date("d-m-Y H:i:s");
             }
             $add_history['updated_user_id'] = $authuser->id;
             $add_history['status'] = 1;
@@ -321,7 +321,6 @@ class InventoryController extends Controller
             });
         
             if($saveinventory){
-
                 $data = '';
                 $message = "Inventory updated successfully";
                 $status = true;
