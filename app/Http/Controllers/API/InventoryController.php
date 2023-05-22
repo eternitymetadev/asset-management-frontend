@@ -315,7 +315,7 @@ class InventoryController extends Controller
             $get_invoice = InventoryInvoice::where('id',$request->asset_id)->first();
             $asset_code = $get_invoice->un_id;
             $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name,];
-            $user['to'] = "amit.thakur@eternitysolutions.net";
+            $user['to'] = "itsupport4@frontieragrotech.com"; //amit.thakur@eternitysolutions.net
 
             Mail::send('inventories.assign-email-template', $data, function ($messges) use ($user, $asset_code) {
                 $messges->to($user['to']);
