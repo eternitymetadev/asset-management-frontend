@@ -55,8 +55,6 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::post('inventory/bulk-upload', [InventoryController::class, 'bulkUpload']);
 
     Route::post('undertaking-upload/{id}', [InventoryController::class, 'undertakingUpload']);
-    Route::get('sample-inventories',[InventoryController::class, 'inventorySampleDownload']);
-
     
  
     // Route::any('/settings/delete-category', [SettingController::class, 'deleteCategory']);
@@ -69,3 +67,5 @@ Route::get('get-employee', [InventoryController::class, 'getEmployee']);
 Route::any('approved-asset/{id}', [InventoryController::class, 'approvedAsset']);
 Route::any('declined-asset/{id}', [InventoryController::class, 'declinedAsset']);
 Route::get('pdf-inventory/{id}', [InventoryController::class, 'pdfInventory']);
+
+Route::get('inventory/sample-inventories',[InventoryController::class, 'inventorySampleDownload']);

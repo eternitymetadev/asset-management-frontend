@@ -100,6 +100,9 @@ class InventoryController extends Controller
             if(!empty($request->invoice_count)){
                 $addinventory['invoice_count'] = $request->invoice_count;
             }
+            if(!empty($request->description)){
+                $addinventory['description'] = $request->description;
+            }
             
             $addinventory['created_user_id'] = $authuser->id;
             $addinventory['status'] = 1;
@@ -631,7 +634,7 @@ class InventoryController extends Controller
 
     public function inventorySampleDownload()
     {
-        $path = public_path('sample/inventory_bulkimport');
+        $path = public_path('sample/inventory_bulkimport.xlsx');
         return response()->download($path);     // use download() helper to download the file
     }
 
