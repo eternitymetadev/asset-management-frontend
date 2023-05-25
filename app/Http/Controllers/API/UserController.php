@@ -83,7 +83,7 @@ class UserController extends Controller
             $requestData['login_id'] = $request->login_id;
             $requestData['phone'] = $request->phone;
             $requestData['role_id'] = $request->role_id;
-            $requestData['department_id'] = $request->department_id;
+            // $requestData['department_id'] = $request->department_id;
             $requestData['status'] = 1;
             
             try {

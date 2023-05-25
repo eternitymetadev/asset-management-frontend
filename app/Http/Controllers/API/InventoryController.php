@@ -805,7 +805,6 @@ class InventoryController extends Controller
     // pullback email accept request to employee
     public function acceptPullback(Request $request)
     {
-        // $id = decrypt($id);
         try {
             $updateinventory['status'] = 7;
             $saveinventory = InventoryInvoice::where('id',$request->asset_id)->update($updateinventory);
