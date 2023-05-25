@@ -22,35 +22,18 @@ class RoleTableSeeder extends Seeder
                 'created_at' => time()
             ],
             [
-                'name' => 'Branch Manager',
-                'slug' => 'branch-manager',
+                'name' => 'IT',
+                'slug' => 'it',
                 'status' => 1,
                 'created_at' => time()
             ],
             [
-                'name' => 'Regional Manager',
-                'slug' => 'regional-manager',
+                'name' => 'HR',
+                'slug' => 'hr',
                 'status' => 1,
                 'created_at' => time()
             ],
-            [
-                'name' => 'Branch User',
-                'slug' => 'branch-user',
-                'status' => 1,
-                'created_at' => time()
-            ], 
-            [
-                'name' => 'Account Manager',
-                'slug' => 'account-manager',
-                'status' => 1,
-                'created_at' => time()
-            ], 
-            [
-                'name' => 'Client User',
-                'slug' => 'client-user',
-                'status' => 1,
-                'created_at' => time()
-            ],
+            
             
         ];
         foreach ($input as $val) {

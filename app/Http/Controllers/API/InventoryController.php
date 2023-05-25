@@ -28,20 +28,88 @@ use Crypt;
 class InventoryController extends Controller
 {
     public function inventoryList(Request $request)
-    {
+    {        
         try{
+            // $this->prefix = request()->route()->getPrefix();
             $authuser = Auth::user();
-            $query = InventoryInvoice::with('Category','Brand','Inventories')->whereIn('status',[1,2,3])->get();
-
-            $datalist = array();
-            if(!empty($query)){
-                foreach($query as $key => $d){
-                    $datalist[$key] = $d;
-
-                    $datalist[$key]->asset_children = json_decode($d->asset_children_id);
+            // $peritem = Config::get('variable.PER_PAGE');
+            $peritem = 2;
+            $query = InventoryInvoice::query();
+            if ($request) {
+                // if (isset($request->resetfilter)) {
+                //     Session::forget('peritem');
+                //     return response()->json(['success' => true]); 
+                // }
+                if (isset($request->assetStatus)) {
+                     $query->where('status',$request->assetStatus);
                 }
-                if($datalist){
-                    $data = $datalist;
+                
+                if (!empty($request->searchKeyword)) {
+                    $search = $request->searchKeyword;
+                    $searchT = str_replace("'", "", $search);
+                    $query->where(function ($query) use ($search, $searchT) {
+                        $query->where('un_id', 'like', '%' . $search . '%')
+                        ->orWhere('model', 'like', '%' . $search . '%')
+                        ->orWhere('unit_price', 'like', '%' . $search . '%')
+                        ->orWhere('sno', 'like', '%' . $search . '%')
+                        ->orWhereHas('Brand', function ($brandquery) use ($search) {
+                            $brandquery->where('name', 'like', '%' . $search . '%');
+                        })
+                        ->orWhereHas('Category', function ($categoryquery) use ($search) {
+                            $categoryquery->where('name', 'like', '%' . $search . '%');
+                        })
+                        ->orWhereHas('Inventories', function ($inventoryquery) use ($search) {
+                            $inventoryquery->where('unit_id', 'like', '%' . $search . '%')
+                            ->orWhere('vendor_name', 'like', '%' . $search . '%')
+                            ->orWhere('invoice_no', 'like', '%' . $search . '%')
+                            ->orWhere('assign_emp_name', 'like', '%' . $search . '%');
+                        });
+                            
+                    });
+                }
+
+                if ($request->peritem) {
+                    Session::put('peritem', $request->peritem);
+                }
+    
+                $peritem = Session::get('peritem');
+                if (!empty($peritem)) {
+                    $peritem = $peritem;
+                } else {
+                    $peritem = Config::get('variable.PER_PAGE');
+                }
+
+                $inventories = $query->with('Category','Brand','Inventories')->whereNotIn('status',[0])->paginate($peritem);
+                $inventories = $inventories->appends($request->query());
+                if($inventories){
+                    // foreach($inventories as $key => $d){
+                    //     $datalist[$key] = $d;
+                    //     // $datalist[$key]->asset_children = json_decode($d->asset_children_id);
+                    //     $datalist[$key] = Helper::AssetInvcStatus($d->status);
+                    // }
+                    $data= $inventories;
+                    $message = "Inventories fetched Successfully";
+                    $status = true;
+                    $errorCode = 200;
+                }else{
+                    $data= $inventories;
+                    $message = "Data not found!";
+                    $status = true;
+                    $errorCode = 200;
+                }
+                return Helper::apiResponseSend($message,$data,$status,$errorCode);
+            }
+            $inventories = $query->with('Category','Brand','Inventories')->whereNotIn('status',[0])->paginate($peritem);
+
+            // $datalist = array();
+            if(!empty($inventories)){
+                // foreach($inventories as $key => $d){
+                //     $datalist[$key] = $d;
+                //     // $datalist[$key]->asset_children = json_decode($d->asset_children_id);
+                //     $datalist[$key] = Helper::AssetInvcStatus($d->status);
+                // }
+                if($inventories){
+                    $data= $inventories;
                     $message = "Inventories fetched Successfully";
                     $status = true;
                     $errorCode = 200;
@@ -232,9 +300,6 @@ class InventoryController extends Controller
         try {
             $this->prefix = request()->route()->getPrefix();
             $rules = array(
-                // 'name' => 'required',
-                // 'login_id' => 'required',
-                // 'email'  => 'required',
                 // 'name'      => ['required', 'string', 'unique:brands'],
             );
             $validator = Validator::make($request->all(),$rules);
@@ -266,8 +331,9 @@ class InventoryController extends Controller
                 $updateinventory['unassigned_date'] = date("d-m-Y H:i:s");
                 $updateinventory['assign_emp_id'] = '';
                 $updateinventory['assign_emp_name'] = '';
+                $updateinventory['assigned_date'] = '';
             }
-            if($request->status == 2){
+            if($request->status == 4){
                 $updateinventory['assigned_date'] = date("d-m-Y H:i:s");
                 $updateinventory['assign_emp_id'] = $request->assign_emp_id;
                 $updateinventory['assign_emp_name'] = $request->assign_emp_name;
@@ -312,16 +378,16 @@ class InventoryController extends Controller
 
             // mail send to authorize user
             
-            $get_invoice = InventoryInvoice::where('id',$request->asset_id)->first();
-            $asset_code = $get_invoice->un_id;
-            $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name,];
-            $user['to'] = "itsupport4@frontieragrotech.com"; //amit.thakur@eternitysolutions.net
+            // $get_invoice = InventoryInvoice::where('id',$request->asset_id)->first();
+            // $asset_code = $get_invoice->un_id;
+            // $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name,];
+            // $user['to'] = "itsupport4@frontieragrotech.com"; //amit.thakur@eternitysolutions.net
 
-            Mail::send('inventories.assign-email-template', $data, function ($messges) use ($user, $asset_code) {
-                $messges->to($user['to']);
-                $messges->subject('Mail for Asset Approval : Asset Code. '."FRC-CHD-".$asset_code.'');
+            // Mail::send('inventories.assign-email-template', $data, function ($messges) use ($user, $asset_code) {
+            //     $messges->to($user['to']);
+            //     $messges->subject('Mail for Asset Approval : Asset Code. '."FRC-CHD-".$asset_code.'');
 
-            });
+            // });
         
             if($saveinventory){
                 $data = '';
@@ -348,12 +414,16 @@ class InventoryController extends Controller
         $id = decrypt($id);
         try {
             $updateinventory['is_approved'] = 1;
+            $updateinventory['status'] = 2;
             $saveinventory = InventoryInvoice::where('id',$id)->update($updateinventory);
             
             //insert in history
+            $authuser = Auth::user();
+            
             $add_history['inventory_invoice_id'] = $id;
             $add_history['is_approved'] = 1;
-            $add_history['status'] = 1;
+            // $add_history['updated_user_id'] = $authuser->id;
+            $add_history['status'] = 2;
 
             InventoryHistory::create($add_history);
 
@@ -556,50 +626,48 @@ class InventoryController extends Controller
         return Helper::apiResponseSend($message,$data,$status,$errorCode);
     }
 
-    public function getEmployee()
-    {
-        // echo'<pre>'; print_r('hhhh'); die;
-        try{
-            $url = 'https://test-courier.easemyorder.com/api/get-employee-list';
-            $curl = curl_init();
+    // public function getEmployee()
+    // {
+    //     try{
+    //         $url = 'https://test-courier.easemyorder.com/api/get-employee-list';
+    //         $curl = curl_init();
 
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => $url,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'GET',
-            ));
+    //         curl_setopt_array($curl, array(
+    //             CURLOPT_URL => $url,
+    //             CURLOPT_RETURNTRANSFER => true,
+    //             CURLOPT_ENCODING => '',
+    //             CURLOPT_MAXREDIRS => 10,
+    //             CURLOPT_TIMEOUT => 0,
+    //             CURLOPT_FOLLOWLOCATION => true,
+    //             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    //             CURLOPT_CUSTOMREQUEST => 'GET',
+    //         ));
 
-            $response = curl_exec($curl);
+    //         $response = curl_exec($curl);
 
-            curl_close($curl);
+    //         curl_close($curl);
 
-            // $response = curl_exec($curl);
+    //         // $response = curl_exec($curl);
             
-            // curl_close($curl);
-            $res = json_decode($response);
-            // dd($res);
-            $data['vendor_data'] = $res->data;
+    //         // curl_close($curl);
+    //         $res = json_decode($response);
+    //         $data['vendor_data'] = $res->data;
 
-            if($data)
-            {
-                $data = $data;
-                $message = "Vendors fetched Successfully";
-                $status = true;
-                $errorCode = 200;
-            }
-        }catch(Exception $e) {
-            $data = $query;
-            $message = "Invalid Record";
-            $status = false;
-            $errorCode = 402;
-        }        
-        return Helper::apiResponseSend($message,$data,$status,$errorCode);
-    }
+    //         if($data)
+    //         {
+    //             $data = $data;
+    //             $message = "Vendors fetched Successfully";
+    //             $status = true;
+    //             $errorCode = 200;
+    //         }
+    //     }catch(Exception $e) {
+    //         $data = $query;
+    //         $message = "Invalid Record";
+    //         $status = false;
+    //         $errorCode = 402;
+    //     }        
+    //     return Helper::apiResponseSend($message,$data,$status,$errorCode);
+    // }
     
     //download excel/csv
     public function exportInventory(){
@@ -621,15 +689,12 @@ class InventoryController extends Controller
                 $errorCode = 402;
             }
         }catch(Exception $e) {
-            
             $data = '';
             $message = "Invalid Record";
             $status = false;
             $errorCode = 402;
         }
-    
-    return Helper::apiResponseSend($message,$data,$status,$errorCode);
-
+        return Helper::apiResponseSend($message,$data,$status,$errorCode);
     }
 
     public function inventorySampleDownload()
@@ -637,5 +702,233 @@ class InventoryController extends Controller
         $path = public_path('sample/inventory_bulkimport.xlsx');
         return response()->download($path);     // use download() helper to download the file
     }
+
+    public function handoverEmployee(Request $request){
+        try{
+            if($request->emp_email){
+                // mail send to employee
+                $get_invoice = InventoryInvoice::where('id',$request->asset_id)->first();
+                $asset_code = $get_invoice->un_id;
+
+                $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name,];
+                $user['to'] = "amit.thakur@eternitysolutions.net"; //request->emp_email
+
+                Mail::send('inventories.handover-emp-email-template', $data, function ($messges) use ($user, $asset_code) {
+                    $messges->to($user['to']);
+                    $messges->subject('New asset assigned : Asset Code. '."FRC-CHD-".$asset_code.'');
+                });
+                $updateinventory['status'] =5;
+
+                $data = InventoryInvoice::where('id',$request->asset_id)->update($updateinventory);
+                $authuser = Auth::user();
+                $add_history['inventory_invoice_id'] = $request->asset_id;
+                $add_history['updated_user_id'] = $authuser->id;
+                $add_history['status'] = 5;
+
+                InventoryHistory::create($add_history);
+
+                
+                if($data){
+                    $data = '';
+                    $message = "Inventory updated successfully";
+                    $status = true;
+                    $errorCode = 200;
+                }else{
+                    $data = '';
+                    $message = "Inventory updated failed!";
+                    $status = false;
+                    $errorCode = 402;
+                }
+            }else{
+                $data = '';
+                $message = "Inventory updated failed!";
+                $status = false;
+                $errorCode = 402;
+            }
+        }catch(Exception $e) {
+            $data = '';
+            $message = "Invalid Record";
+            $status = false;
+            $errorCode = 402;
+        }
+        return Helper::apiResponseSend($message,$data,$status,$errorCode);
+    }
+
+    public function pullbackToEmployee(Request $request){
+        try{
+            if($request->emp_email){
+                // mail send to employee
+                $get_invoice = InventoryInvoice::where('id',$request->asset_id)->first();
+                $asset_code = $get_invoice->un_id;
+
+                $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name, 'status'=>6];
+                $user['to'] = "amit.thakur@eternitysolutions.net"; //request->emp_email
+
+                Mail::send('inventories.pullback-asset-emp-email-template', $data, function ($messges) use ($user, $asset_code) {
+                    $messges->to($user['to']);
+                    $messges->subject('Pull back asset : Asset Code. '."FRC-CHD-".$asset_code.'');
+                });
+                $updateinventory['status'] =6;
+
+                $data = InventoryInvoice::where('id',$request->asset_id)->update($updateinventory);
+                if($data){
+                    $authuser = Auth::user();
+                    $add_history['inventory_invoice_id'] = $request->asset_id;
+                    $add_history['updated_user_id'] = $authuser->id;
+                    $add_history['status'] = 6;
+                    
+                    $data = '';
+                    $message = "Inventory updated successfully";
+                    $status = true;
+                    $errorCode = 200;
+                }else{
+                    $data = '';
+                    $message = "Inventory updated failed!";
+                    $status = false;
+                    $errorCode = 402;
+                }
+            }else{
+                $data = '';
+                $message = "Inventory updated failed!";
+                $status = false;
+                $errorCode = 402;
+            }
+        }catch(Exception $e) {
+            $data = '';
+            $message = "Invalid Record";
+            $status = false;
+            $errorCode = 402;
+        }
+        return Helper::apiResponseSend($message,$data,$status,$errorCode);
+    }
+
+    // pullback email accept request to employee
+    public function acceptPullback(Request $request)
+    {
+        // $id = decrypt($id);
+        try {
+            $updateinventory['status'] = 7;
+            $saveinventory = InventoryInvoice::where('id',$request->asset_id)->update($updateinventory);
+            
+            //insert in history
+            $authuser = Auth::user();
+            
+            $add_history['inventory_invoice_id'] = $request->asset_id; 
+            $add_history['updated_user_id'] = $authuser->id;
+            $add_history['status'] = 7;
+
+            InventoryHistory::create($add_history);
+
+            if($saveinventory){
+                $data = '';
+                $message = "Inventory Approved successfully";
+                $status = true;
+                $errorCode = 200;
+            }else{
+                $data = $addinventory;
+                $message = "Invalid Record";
+                $status = false;
+                $errorCode = 402;
+            }
+        }catch(Exception $e) {
+            $data = '';
+            $message = $e->message;
+            $status = false;
+            $errorCode = 500;
+        }
+        return Helper::apiResponseSend($message,$data,$status,$errorCode);
+    }
+    // scrap email request to account team
+    public function scrapEmailRequest(Request $request){
+        try{
+            if($request->account_email){
+                // mail send to employee
+                $get_invoice = InventoryInvoice::where('id',$request->asset_id)->first();
+                $asset_code = $get_invoice->un_id;
+
+                $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name,];
+                $user['to'] = "amit.thakur@eternitysolutions.net"; //request->account_email
+
+                Mail::send('inventories.scrap-email-template', $data, function ($messges) use ($user, $asset_code) {
+                    $messges->to($user['to']);
+                    $messges->subject('Scrap request for Asset '."FRC-CHD-".$asset_code.'');
+                });
+                $updateinventory['status'] =8;
+
+                $data = InventoryInvoice::where('id',$request->asset_id)->update($updateinventory);
+                $authuser = Auth::user();
+                $add_history['inventory_invoice_id'] = $request->asset_id;
+                $add_history['updated_user_id'] = $authuser->id;
+                $add_history['status'] = 8;
+
+                InventoryHistory::create($add_history);
+
+                
+                if($data){
+                    $data = '';
+                    $message = "Inventory updated successfully";
+                    $status = true;
+                    $errorCode = 200;
+                }else{
+                    $data = '';
+                    $message = "Inventory updated failed!";
+                    $status = false;
+                    $errorCode = 402;
+                }
+            }else{
+                $data = '';
+                $message = "Inventory updated failed!";
+                $status = false;
+                $errorCode = 402;
+            }
+        }catch(Exception $e) {
+            $data = '';
+            $message = "Invalid Record";
+            $status = false;
+            $errorCode = 402;
+        }
+        return Helper::apiResponseSend($message,$data,$status,$errorCode);
+    }
+
+    //click on  scrap accept email request by accounts
+    public function acceptScrap($id)
+    {
+        $id = decrypt($id);
+        try {
+            $updateinventory['status'] = 9;
+            $saveinventory = InventoryInvoice::where('id',$id)->update($updateinventory);
+            
+            //insert in history
+            $authuser = Auth::user();
+            
+            $add_history['inventory_invoice_id'] = $id; 
+            // $add_history['updated_user_id'] = $authuser->id;
+            $add_history['status'] = 9;
+
+            InventoryHistory::create($add_history);
+
+            if($saveinventory){
+                $data = '';
+                $message = "Inventory Scrapped successfully";
+                $status = true;
+                $errorCode = 200;
+
+
+            }else{
+                $data = $addinventory;
+                $message = "Invalid Record";
+                $status = false;
+                $errorCode = 402;
+            }
+        }catch(Exception $e) {
+            $data = '';
+            $message = $e->message;
+            $status = false;
+            $errorCode = 500;
+        }
+        return ($message);
+    }
+
+
 
 }

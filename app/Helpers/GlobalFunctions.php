@@ -35,6 +35,23 @@ class GlobalFunctions
         } else if ($status == 3) {
             $status = 'Scrapped';
         }
+
+        else if ($status == 4) {
+            $status = 'Handover to HR';
+        }
+        else if ($status == 5) {
+            $status = 'Handover to Emp';
+        }
+        else if ($status == 6) {
+            $status = 'Recovery Pending';
+        }else if ($status == 7) {
+            $status = 'Recovery Completed';
+        }else if ($status == 8) {
+            $status = 'Scrap Pending';
+        }else if ($status == 9) {
+            $status = 'Ready to Scrap';
+        }
+        
         return $status;
     }
 
