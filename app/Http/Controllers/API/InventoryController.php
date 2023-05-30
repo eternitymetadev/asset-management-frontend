@@ -377,17 +377,19 @@ class InventoryController extends Controller
             InventoryHistory::create($add_history);
 
             // mail send to authorize user
-            
-            // $get_invoice = InventoryInvoice::where('id',$request->asset_id)->first();
-            // $asset_code = $get_invoice->un_id;
-            // $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name,];
-            // $user['to'] = "itsupport4@frontieragrotech.com"; //amit.thakur@eternitysolutions.net
+            if($request->status == 4){
+                $get_invoice = InventoryInvoice::where('id',$request->asset_id)->first();
+                $asset_code = $get_invoice->un_id;
+                $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name,];
+                $user['to'] = "amit.thakur@eternitysolutions.net";
+                // $user['to'] = "itsupport4@frontieragrotech.com";
 
-            // Mail::send('inventories.assign-email-template', $data, function ($messges) use ($user, $asset_code) {
-            //     $messges->to($user['to']);
-            //     $messges->subject('Mail for Asset Approval : Asset Code. '."FRC-CHD-".$asset_code.'');
+                Mail::send('inventories.assign-email-template', $data, function ($messges) use ($user, $asset_code) {
+                    $messges->to($user['to']);
+                    $messges->subject('New Asset handover to HR : Asset Code. '."FRC-CHD-".$asset_code.'');
 
-            // });
+                });
+            }
         
             if($saveinventory){
                 $data = '';
@@ -413,30 +415,38 @@ class InventoryController extends Controller
     {
         $id = decrypt($id);
         try {
-            $updateinventory['is_approved'] = 1;
-            $updateinventory['status'] = 2;
-            $saveinventory = InventoryInvoice::where('id',$id)->update($updateinventory);
-            
-            //insert in history
-            $authuser = Auth::user();
-            
-            $add_history['inventory_invoice_id'] = $id;
-            $add_history['is_approved'] = 1;
-            // $add_history['updated_user_id'] = $authuser->id;
-            $add_history['status'] = 2;
+            $get_invoice = InventoryInvoice::where('id',$id)->first();
+            if($get_invoice->status == 5){
+                $updateinventory['is_approved'] = 1;
+                $updateinventory['status'] = 2;
+                $saveinventory = InventoryInvoice::where('id',$id)->update($updateinventory);
+                
+                //insert in history
+                $authuser = Auth::user();
+                
+                $add_history['inventory_invoice_id'] = $id;
+                $add_history['is_approved'] = 1;
+                // $add_history['updated_user_id'] = $authuser->id;
+                $add_history['status'] = 2;
 
-            InventoryHistory::create($add_history);
+                InventoryHistory::create($add_history);
 
-            if($saveinventory){
-                $data = '';
-                $message = "Inventory Approved successfully";
-                $status = true;
-                $errorCode = 200;
+                if($saveinventory){
+                    $data = '';
+                    $message = "Inventory Approved successfully";
+                    $status = true;
+                    $errorCode = 200;
 
 
+                }else{
+                    $data = $addinventory;
+                    $message = "Invalid Record";
+                    $status = false;
+                    $errorCode = 402;
+                }
             }else{
-                $data = $addinventory;
-                $message = "Invalid Record";
+                $data = '';
+                $message = "Invalid URL";
                 $status = false;
                 $errorCode = 402;
             }
@@ -806,6 +816,18 @@ class InventoryController extends Controller
     public function acceptPullback(Request $request)
     {
         try {
+            // mail send to employee
+            $get_invoice = InventoryInvoice::where('id',$request->asset_id)->first();
+            $asset_code = $get_invoice->un_id;
+
+            $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name, 'status'=>6];
+            $user['to'] = "amit.thakur@eternitysolutions.net"; //Email to IT 
+
+            Mail::send('inventories.unasigned-req-email-template', $data, function ($messges) use ($user, $asset_code) {
+                $messges->to($user['to']);
+                $messges->subject('Request to Un-assign : Asset Code. '."FRC-CHD-".$asset_code.'');
+            }); 
+
             $updateinventory['status'] = 7;
             $saveinventory = InventoryInvoice::where('id',$request->asset_id)->update($updateinventory);
             
@@ -846,22 +868,23 @@ class InventoryController extends Controller
                 $asset_code = $get_invoice->un_id;
 
                 $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name,];
-                $user['to'] = "amit.thakur@eternitysolutions.net"; //request->account_email
+                $user['to'] = "amit.thakur@eternitysolutions.net"; //Email send to account
 
                 Mail::send('inventories.scrap-email-template', $data, function ($messges) use ($user, $asset_code) {
                     $messges->to($user['to']);
                     $messges->subject('Scrap request for Asset '."FRC-CHD-".$asset_code.'');
                 });
-                $updateinventory['status'] =8;
+                $updateinventory['remarks'] = $request->remarks;
+                $updateinventory['status'] = 8;
 
                 $data = InventoryInvoice::where('id',$request->asset_id)->update($updateinventory);
                 $authuser = Auth::user();
                 $add_history['inventory_invoice_id'] = $request->asset_id;
                 $add_history['updated_user_id'] = $authuser->id;
+                $add_history['remarks'] = $request->remarks;
                 $add_history['status'] = 8;
 
                 InventoryHistory::create($add_history);
-
                 
                 if($data){
                     $data = '';
@@ -894,28 +917,37 @@ class InventoryController extends Controller
     {
         $id = decrypt($id);
         try {
-            $updateinventory['status'] = 9;
-            $saveinventory = InventoryInvoice::where('id',$id)->update($updateinventory);
-            
-            //insert in history
-            $authuser = Auth::user();
-            
-            $add_history['inventory_invoice_id'] = $id; 
-            // $add_history['updated_user_id'] = $authuser->id;
-            $add_history['status'] = 9;
+            $get_invoice = InventoryInvoice::where('id',$id)->first();
+            if($get_invoice->status == 8){
 
-            InventoryHistory::create($add_history);
+                $updateinventory['status'] = 9;
+                $saveinventory = InventoryInvoice::where('id',$id)->update($updateinventory);
+                
+                //insert in history
+                $authuser = Auth::user();
+                
+                $add_history['inventory_invoice_id'] = $id; 
+                // $add_history['updated_user_id'] = $authuser->id;
+                $add_history['status'] = 9;
 
-            if($saveinventory){
-                $data = '';
-                $message = "Inventory Scrapped successfully";
-                $status = true;
-                $errorCode = 200;
+                InventoryHistory::create($add_history);
+
+                if($saveinventory){
+                    $data = '';
+                    $message = "Inventory Scrapped successfully";
+                    $status = true;
+                    $errorCode = 200;
 
 
+                }else{
+                    $data = $addinventory;
+                    $message = "Invalid Record";
+                    $status = false;
+                    $errorCode = 402;
+                }
             }else{
-                $data = $addinventory;
-                $message = "Invalid Record";
+                $data = '';
+                $message = "Invalid URL";
                 $status = false;
                 $errorCode = 402;
             }

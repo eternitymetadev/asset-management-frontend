@@ -19,11 +19,8 @@
         Dear Sir,<br /><br />
         Asset code FRC-CHD-{{$un_id}} is assigned to Employee code: {{$emp_id}} and Employee Name: {{$emp_name}}
 
-        We need to verify<br />
 
-        Please click on the following link to approved / declined your email address:
-        
-        
+        <br /><br />
 
         Auto Email from Eternity
     </p>

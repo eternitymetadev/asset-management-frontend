@@ -17,6 +17,22 @@ use Auth;
 
 class UserController extends Controller
 {
+    public function logout(Request $request){
+        $user = Auth::user();
+        $user_name = "";
+        if(isset($user->name))
+        {
+            $user_name = $user->name;            
+        }
+        Auth::logout();
+
+        $data = '';
+        $message = "Logout Successfully";
+        $status = true;
+        $errorCode = 200;
+        return Helper::apiResponseSend($message,$data,$status,$errorCode);
+    }
+
     public function userList(Request $request)
     {
         try{
