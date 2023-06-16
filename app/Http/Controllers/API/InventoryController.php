@@ -297,6 +297,7 @@ class InventoryController extends Controller
 
     public function updateAssignStatus(Request $request)
     {
+        // return $request->all();
         try {
             $this->prefix = request()->route()->getPrefix();
             $rules = array(
@@ -378,14 +379,15 @@ class InventoryController extends Controller
 
             // mail send to authorize user
             if($request->status == 4){
-                $get_invoice = InventoryInvoice::where('id',$request->asset_id)->first();
+                $get_invoice = InventoryInvoice::with('Category')->where('id',$request->asset_id)->first();
                 $asset_code = $get_invoice->un_id;
-                $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name,];
-                $user['to'] = "amit.thakur@eternitysolutions.net";
-                // $user['to'] = "itsupport4@frontieragrotech.com";
-
+                $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name,'asset_category' => $get_invoice->Category->name,'asset_model' => $get_invoice->model,'asset_sno' => $get_invoice->sno];
+                $user['to'] = "support1hr@frontierag.com";
+                $user['cc'] = ["itsupport@frontierag.com;", "hrd@frontierag.com;"];
+                
                 Mail::send('inventories.assign-email-template', $data, function ($messges) use ($user, $asset_code) {
                     $messges->to($user['to']);
+                    $messges->cc($user['cc']);
                     $messges->subject('New Asset handover to HR : Asset Code. '."FRC-CHD-".$asset_code.'');
 
                 });
@@ -717,14 +719,16 @@ class InventoryController extends Controller
         try{
             if($request->emp_email){
                 // mail send to employee
-                $get_invoice = InventoryInvoice::where('id',$request->asset_id)->first();
+                $get_invoice = InventoryInvoice::with('Category')->where('id',$request->asset_id)->first();
                 $asset_code = $get_invoice->un_id;
 
-                $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name,];
-                $user['to'] = "amit.thakur@eternitysolutions.net"; //request->emp_email
+                $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name,'asset_category' => $get_invoice->Category->name,];
+                $user['to'] = "itsupport4@frontierag.com"; //request->emp_email
+                $user['cc'] = ['itsupport@frontierag.com','hrd@frontierag.com'];
 
                 Mail::send('inventories.handover-emp-email-template', $data, function ($messges) use ($user, $asset_code) {
                     $messges->to($user['to']);
+                    $messges->to($user['cc']);
                     $messges->subject('New asset assigned : Asset Code. '."FRC-CHD-".$asset_code.'');
                 });
                 $updateinventory['status'] =5;
@@ -768,13 +772,20 @@ class InventoryController extends Controller
         try{
             if($request->emp_email){
                 // mail send to employee
-                $get_invoice = InventoryInvoice::where('id',$request->asset_id)->first();
+                $get_invoice = InventoryInvoice::with('Category')->where('id',$request->asset_id)->first();
                 $asset_code = $get_invoice->un_id;
 
-                $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name, 'status'=>6];
-                $user['to'] = "amit.thakur@eternitysolutions.net"; //request->emp_email
+                $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name, 'asset_category' => $get_invoice->Category->name, 'asset_sno' =>$get_invoice->sno,'status'=>6];
+                $user['to'] = "itsupport4@frontierag.com"; //request->emp_email
+                $user['cc'] = ["itsupport@frontierag.com", "hrd@frontierag.com"];
 
-                Mail::send('inventories.pullback-asset-emp-email-template', $data, function ($messges) use ($user, $asset_code) {
+                if($request->recoveryType =='fullAndFinal'){
+                    $template = 'inventories.pullback-fullfinalasset-emp-email-template';
+                }else{
+                    $template = 'inventories.pullback-replacement-emp-email-template';
+                }
+
+                Mail::send($template, $data, function ($messges) use ($user, $asset_code) {
                     $messges->to($user['to']);
                     $messges->subject('Pull back asset : Asset Code. '."FRC-CHD-".$asset_code.'');
                 });
@@ -817,12 +828,13 @@ class InventoryController extends Controller
     {
         try {
             // mail send to employee
-            $get_invoice = InventoryInvoice::where('id',$request->asset_id)->first();
+            $get_invoice = InventoryInvoice::with('Category')->where('id',$request->asset_id)->first();
             $asset_code = $get_invoice->un_id;
 
-            $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name, 'status'=>6];
-            $user['to'] = "amit.thakur@eternitysolutions.net"; //Email to IT 
-
+            $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name,'asset_category' => $get_invoice->Category->name,'asset_sno' => $get_invoice->sno, 'status'=>6];
+            $user['to'] = "itsupport4@frontierag.com"; //request->emp_email
+            $user['cc'] = ["itsupport@frontierag.com", "hrd@frontierag.com"];
+    
             Mail::send('inventories.unasigned-req-email-template', $data, function ($messges) use ($user, $asset_code) {
                 $messges->to($user['to']);
                 $messges->subject('Request to Un-assign : Asset Code. '."FRC-CHD-".$asset_code.'');
@@ -858,6 +870,10 @@ class InventoryController extends Controller
             $errorCode = 500;
         }
         return Helper::apiResponseSend($message,$data,$status,$errorCode);
+    }
+
+    public function acceptAsset($id){
+        return view('inventories.accept-asset-confirmation',['invoice_id'=>$id]);
     }
     // scrap email request to account team
     public function scrapEmailRequest(Request $request){

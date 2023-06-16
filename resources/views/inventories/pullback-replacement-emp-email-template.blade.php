@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Asset Ready for Employee Handover</title>
+		<title>Return of Company Asset Request</title>
 		<style>
 			/* Add your custom styles here */
 			body {
@@ -11,10 +11,8 @@
 				background-color: #fff;
 				margin: 0;
 				padding: 0;
-				background: #fff;
 			}
 			.container {
-				width: 600px;
 				max-width: 600px;
 				margin: 0 auto;
 				padding: 20px;
@@ -88,32 +86,35 @@
 	<body>
 		<div class="container">
 			<div class="header">
-				<h1>Asset Ready for Employee Handover</h1>
+				<h1>Return of Company Asset Request</h1>
 			</div>
-			<p><strong>Dear HR Department,</strong></p>
+			<p><strong>Dear {{$emp_name}},</strong></p>
 			<p class="indent">
-				Laptop requested for Employee code: {{$emp_id}} and Employee Name: {{$emp_name}} from the IT department has been
-				configured and is ready for handover. We kindly request your assistance
-				in coordinating the handover process to the employee.
+				We kindly request the immediate return of a company asset that is
+				currently assigned to you.
 			</p>
 
 			<p style="text-decoration: underline"><strong>Asset Details:</strong></p>
 			<p style="padding-left: 1.5rem">
-				<strong>Employee Name: </strong> {{$emp_name}}<br />
-				<strong>Asset Type: </strong> {{$asset_category}}<br />
-				<strong>Asset Model: </strong> {{$asset_model}}<br />
-				<strong>Serial Number: </strong> {{$asset_sno}}
+				<strong>Asset Description: </strong>{{$asset_category}} -  FRC-CHD-{{$un_id}}<br />
+				<strong>Serial Number/Identification: </strong> {{$asset_sno}}
 			</p>
 
 			<p>
-				The laptop has been prepared with the necessary software and
-				permissions, ensuring that it is ready for immediate use. Thank you for
-				your assistance in coordinating the handover process.
+				Please arrange for the return of this asset to the HR department as soon
+				as possible.
+			</p>
+			<p class="indent">
+				If you have any questions or need assistance with the return process,
+				please contact the HR department at [HR Contact Information].
+			</p>
+			<p class="indent">
+				Thank you for your cooperation in promptly returning the company asset.
 			</p>
 
 			<p class="footer">
 				<strong>Best regards,</strong><br />
-				[IT Department]
+				[HR Department]
 			</p>
 		</div>
 	</body>

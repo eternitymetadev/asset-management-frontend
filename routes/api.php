@@ -70,7 +70,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 Route::get('check-serialno/{sno}', [InventoryController::class,'CheckSerialno']);
 // Route::get('get-employee', [InventoryController::class, 'getEmployee']);
 // Route::get('get-employee-detail/{id}', [InventoryController::class, 'getEmployeeDetail']);
-
+Route::any('accept-asset/{id}', [InventoryController::class, 'acceptAsset']);
 Route::any('approved-asset/{id}', [InventoryController::class, 'approvedAsset']);
 // Route::any('accept-pullback/{id}', [InventoryController::class, 'acceptPullback']);
 Route::any('accept-scrap/{id}', [InventoryController::class, 'acceptScrap']);
