@@ -25,7 +25,6 @@ class InventoryImport implements ToModel,WithHeadingRow
         // echo "<pre>"; print_r($rows['unit']); die;
         // foreach($rows as $row){
             $authuser = Auth::user();
-            // echo "<pre>"; print_r($rows['serial_no']); die;
             $check_sno = InventoryInvoice::where('sno',$rows['serial_no'])->first();
             if(empty($check_sno)){
                 $add_inventory['unit_id'] = $rows['unit'];

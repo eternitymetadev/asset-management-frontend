@@ -8,6 +8,9 @@ use App\Models\Inventory;
 use App\Models\Category;
 use App\Models\Brand;
 use App\Models\User;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\EmployeeExport;
+use App\Imports\EmployeeImport;
 use Validator;
 use Helper;
 use Config;
@@ -270,6 +273,37 @@ class SettingController extends Controller
             $errorCode = 500;
         }
         return Helper::apiResponseSend($message,$data,$status,$errorCode);
+    }
+
+
+    public function bulkImport(Request $request){
+        $data=$request->all();
+        $file=$data['employeeFile'];
+        try{
+            $data = Excel::import(new EmployeeImport,$file);
+            // return $data;
+           
+            if($data){
+                $data = '';
+                $message = "Employee imported successfully";
+                $status = true;
+                $errorCode = 200;
+            }else{
+                $data = '';
+                $message = "Employee imported failed!";
+                $status = false;
+                $errorCode = 402;
+            }
+        }catch(Exception $e) {
+            $data = '';
+            $message = "Invalid Record";
+            $status = false;
+            $errorCode = 402;
+        }
+        return Helper::apiResponseSend($message,$data,$status,$errorCode);
+    }
+    public function bulkExport(Request $request){
+        
     }
 
 }

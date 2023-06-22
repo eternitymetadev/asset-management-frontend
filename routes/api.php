@@ -62,6 +62,9 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 
     Route::any('accept-pullback', [InventoryController::class, 'acceptPullback']);
 
+    Route::post('employee/bulk-import', [SettingController::class, 'bulkImport']);
+    Route::any('employee/bulk-export', [SettingController::class, 'bulkExport']);
+    
      
     // Route::any('/settings/delete-category', [SettingController::class, 'deleteCategory']);
 
