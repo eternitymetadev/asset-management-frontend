@@ -383,7 +383,7 @@ class InventoryController extends Controller
                 $asset_code = $get_invoice->un_id;
                 $data = ['invoice_id'=>$get_invoice->id,'un_id' => $asset_code,'emp_id'=>$get_invoice->assign_emp_id,'emp_name' => $get_invoice->assign_emp_name,'asset_category' => $get_invoice->Category->name,'asset_model' => $get_invoice->model,'asset_sno' => $get_invoice->sno];
                 $user['to'] = "support1hr@frontierag.com";
-                $user['cc'] = ["itsupport@frontierag.com;", "hrd@frontierag.com;"];
+                $user['cc'] = ["itsupport@frontierag.com", "hrd@frontierag.com"];
                 
                 Mail::send('inventories.assign-email-template', $data, function ($messges) use ($user, $asset_code) {
                     $messges->to($user['to']);
